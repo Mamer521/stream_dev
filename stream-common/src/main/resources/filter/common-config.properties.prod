@@ -1,0 +1,15 @@
+# env
+env=prod
+# mysql
+mysql.host=cdh03
+mysql.port=3306
+mysql.user=root
+mysql.pwd=root
+mysql.databases.conf=gmall2024_config
+mysql.database=gmall
+mysql.url=jdbc:mysql://cdh03:3306?useSSL=false
+mysql.timezone=Asia/Shanghai
+
+
+# Zookeeper Server
+zookeeper.server.host.list=cdh03
