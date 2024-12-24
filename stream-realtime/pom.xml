@@ -20,7 +20,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.zh</groupId>
+            <groupId>com.ms</groupId>
             <artifactId>stream-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

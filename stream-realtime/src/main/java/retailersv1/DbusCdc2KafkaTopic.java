@@ -71,7 +71,7 @@ public class DbusCdc2KafkaTopic {
                 .name("dim_data_convert_json")
                 .setParallelism(1);
 
-        cdcDbDimStreamMap.print();
+//        cdcDbDimStreamMap.print();
 
         SingleOutputStreamOperator<JSONObject> cdcDbDimStreamMapCleanColumn = cdcDbDimStreamMap.map(s -> {
                     s.remove("source");
@@ -87,21 +87,19 @@ public class DbusCdc2KafkaTopic {
                 }).uid("clean_json_column_map")
                 .name("clean_json_column_map");
 
+
 //        cdcDbDimStreamMapCleanColumn.print();
 
         SingleOutputStreamOperator<JSONObject> tpDS = cdcDbDimStreamMapCleanColumn.map(new MapUpdateHbaseDimTableFunc(CDH_ZOOKEEPER_SERVER, CDH_HBASE_NAME_SPACE))
                 .uid("map_create_hbase_dim_table")
                 .name("map_create_hbase_dim_table");
 
+        tpDS.print();
 
         MapStateDescriptor<String, JSONObject> mapStageDesc = new MapStateDescriptor<>("mapStageDesc", String.class, JSONObject.class);
         BroadcastStream<JSONObject> broadcastDs = tpDS.broadcast(mapStageDesc);
         BroadcastConnectedStream<JSONObject, JSONObject> connectDs = cdcDbMainStreamMap.connect(broadcastDs);
-//
-//        connectDs.process(new ProcessSpiltStreamToHBaseDim(mapStageDesc));
-
-
-
+        connectDs.process(new ProcessSpiltStreamToHBaseDim(mapStageDesc));
 
 
 //        cdcDbMainStream.sinkTo(
@@ -112,3 +110,4 @@ public class DbusCdc2KafkaTopic {
     }
 
 }
+

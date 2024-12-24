@@ -13,3 +13,6 @@ mysql.timezone=Asia/Shanghai
 
 # Zookeeper Server
 zookeeper.server.host.list=cdh03
+
+# Hbase
+hbase.namespace=stream_dev
