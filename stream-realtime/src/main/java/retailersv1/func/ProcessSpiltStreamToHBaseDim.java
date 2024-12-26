@@ -74,16 +74,23 @@ public class ProcessSpiltStreamToHBaseDim extends BroadcastProcessFunction<JSONO
 //                System.err.println(jsonObject);
                 if (!jsonObject.getString("op").equals("d")){
                     JSONObject after = jsonObject.getJSONObject("after");
+//                    System.out.println(after);
+                    //获取配置表与主流的关联后的表
                     String sinkTableName = configMap.get(tableName).getSinkTable();
+//                    System.out.println(sinkTableName);
                     sinkTableName = "stream_dev:"+sinkTableName;
+                    //configMap.get(tableName).getSinkRowKey()获取主流对应的配置表中的sinkrowkey字段
+                    //获取到after中对应的sinkrowkey字段
                     String hbaseRowKey = after.getString(configMap.get(tableName).getSinkRowKey());
+//                    System.out.println("SinkRowKey:"+hbaseRowKey);
+                    //在hbase获取,主流和配置流关联后的表
                     Table hbaseConnectionTable = hbaseConnection.getTable(TableName.valueOf(sinkTableName));
                     Put put = new Put(Bytes.toBytes(hbaseRowKey));
                     for (Map.Entry<String, Object> entry : after.entrySet()) {
                         put.addColumn(Bytes.toBytes("info"),Bytes.toBytes(entry.getKey()),Bytes.toBytes(String.valueOf(entry.getValue())));
                     }
                     hbaseConnectionTable.put(put);
-                    System.err.println("put -> "+put.toJSON()+" "+ Arrays.toString(put.getRow()));
+//                    System.err.println("put -> "+put.toJSON()+" "+ Arrays.toString(put.getRow()));
                 }
             }
         }

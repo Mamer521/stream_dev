@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.common.utils.ConfigUtils;
 import com.common.utils.EnvironmentSettingUtils;
+import com.common.utils.KafkaUtils;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import lombok.SneakyThrows;
@@ -94,7 +95,7 @@ public class DbusCdc2KafkaTopic {
                 .uid("map_create_hbase_dim_table")
                 .name("map_create_hbase_dim_table");
 
-        tpDS.print();
+//        tpDS.print();
 
         MapStateDescriptor<String, JSONObject> mapStageDesc = new MapStateDescriptor<>("mapStageDesc", String.class, JSONObject.class);
         BroadcastStream<JSONObject> broadcastDs = tpDS.broadcast(mapStageDesc);
@@ -105,6 +106,8 @@ public class DbusCdc2KafkaTopic {
 //        cdcDbMainStream.sinkTo(
 //                KafkaUtils.buildKafkaSink(ConfigUtils.getString("kafka.bootstrap.servers"),"realtime_v1_mysql_db")
 //        ).uid("sink_to_kafka_realtime_v1_mysql_db").name("sink_to_kafka_realtime_v1_mysql_db");
+
+
 
         env.execute();
     }

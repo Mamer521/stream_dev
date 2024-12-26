@@ -10,9 +10,20 @@ mysql.database=gmall
 mysql.url=jdbc:mysql://cdh03:3306?useSSL=false
 mysql.timezone=Asia/Shanghai
 
+# kafka cdh
+kafka.bootstrap.servers=cdh01:9092,cdh02:9092:cdh03:9092
+REALTIME.KAFKA.LOG.TOPIC=topic_log
+kafka.topic.db=topic_db
+# 日志log
+kafka.err.log=kafka_err_log
+kafka.start.log=kafka.start.log
+kafka.display.log=kafka_display_log
+kafka.action.log=kafka_action_log
+kafka.page.topic=kafka_page_topic
+
 
 # Zookeeper Server
-zookeeper.server.host.list=cdh03
+zookeeper.server.host.list=cdh03:2181
 
 # Hbase
 hbase.namespace=stream_dev

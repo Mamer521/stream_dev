@@ -84,6 +84,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+            <version>2.0.3</version>
         </dependency>
 
         <!-- Flink 流批一体 Stream 写入HDFS 并指定ORC的存储格式-->
