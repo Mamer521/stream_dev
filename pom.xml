@@ -11,7 +11,7 @@
     <modules>
         <module>stream-common</module>
         <module>stream-realtime</module>
-        <module>stream-func</module>
+        <module>stream-deploy</module>
     </modules>
 
     <properties>

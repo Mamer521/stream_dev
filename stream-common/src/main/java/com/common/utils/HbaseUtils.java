@@ -179,6 +179,6 @@ public class HbaseUtils {
     @SneakyThrows
     public static void main(String[] args) {
         HbaseUtils hbaseUtils = new HbaseUtils("cdh01,cdh02,cdh03");
-        hbaseUtils.dropHbaseNameSpace("stream_dev");
+        hbaseUtils.dropHbaseNameSpace("gmall");
     }
 }

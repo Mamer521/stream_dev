@@ -20,6 +20,7 @@ kafka.start.log=kafka.start.log
 kafka.display.log=kafka_display_log
 kafka.action.log=kafka_action_log
 kafka.page.topic=kafka_page_topic
+kafka.topic.dwd.trade.cart.add=dwd_trade_cart_add
 
 
 # Zookeeper Server
@@ -27,3 +28,9 @@ zookeeper.server.host.list=cdh03:2181
 
 # Hbase
 hbase.namespace=stream_dev
+
+
+# flink
+flink.submit.user=root
+flink.conf.configurationDirectory=E:\Study\workspace\2203A\stream_dev\stream-deploy\src\main\resources\conf
+flink.cluster.libs=hdfs://cdh01:8020/flink-jars
