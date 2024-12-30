@@ -35,6 +35,8 @@ public class DwdCartAdd {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettingUtils.defaultParameter(env);
 
+
+
         DataStreamSource<String> streamSource = env.fromSource(KafkaUtils.buildKafkaSource(
                         kafka_bootstrap_servers,
                         kafka_topic_db,
@@ -43,9 +45,12 @@ public class DwdCartAdd {
                 WatermarkStrategy.noWatermarks(),
                 "kafka_topic_db");
 
+
         SingleOutputStreamOperator<JSONObject> kafkasource_topic_db = streamSource.map(JSONObject::parseObject)
                 .uid("kafkasource_topic_db")
                 .name("kafkasource_topic_db");
+
+
 
 //        kafkasource_topic_db.print("kafkasource_topic_db>>>>");
         SingleOutputStreamOperator<JSONObject> streamOperator = kafkasource_topic_db.flatMap(new FlatMapFunction<JSONObject, JSONObject>() {
@@ -62,7 +67,7 @@ public class DwdCartAdd {
         StreamTableEnvironment tenv = StreamTableEnvironment.create(env);
 
         tenv.executeSql("CREATE TABLE topic_db (\n" +
-                " op string," +
+                "op string," +
                 "db string," +
                 "before map<String,String>," +
                 "after map<String,String>," +
@@ -79,31 +84,34 @@ public class DwdCartAdd {
                 "  'format' = 'json'\n" +
                 ")");
 
+//        tenv.sqlQuery("select * from topic_db").execute().print();
+
         Table table = tenv.sqlQuery("select " +
-                "`after` ['id'] as id ,\n" +
-                "`after` ['user_id'] as user_id ,\n" +
-                "`after` ['sku_id'] as sku_id ,\n" +
-                "`after` ['cart_price'] as cart_price ,\n" +
-                "if(op='c',cast(after['sku_num'] as bigint),cast(after['sku_num'] as bigint)-cast(before['sku_num'] as bigint)) sku_num ,\n" +
-                "`after` ['img_url'] as img_url ,\n" +
+                "`after` ['id'] as id,\n" +
+                "`after` ['user_id'] as user_id,\n" +
+                "`after` ['sku_id'] as sku_id,\n" +
+                "`after` ['cart_price'] as cart_price,\n" +
+                "if(op='c',cast(after['sku_num'] as bigint),cast(after['sku_num'] as bigint)-cast(before['sku_num'] as bigint)) sku_num,\n" +
+                "`after` ['img_url'] as img_url,\n" +
                 "`after` ['sku_name'] as sku_name,\n" +
-                "`after` ['is_checked'] as is_checked ,\n" +
-                "`after` ['create_time'] as create_time ,\n" +
+                "`after` ['is_checked'] as is_checked,\n" +
+                "`after` ['create_time'] as create_time,\n" +
                 "`after` ['operate_time'] as operate_time ,\n" +
-                "`after` ['is_ordered'] as is_ordered ,\n" +
-                "`after` ['order_time'] as order_time ," +
+                "`after` ['is_ordered'] as is_ordered,\n" +
+                "`after` ['order_time'] as order_time," +
                 "ts_ms as ts_ms " +
                 "from topic_db " +
-                "where source['table']='cart_info' and source['db']='gmall'  " +
-                "and (op='c' or (op='u' and before['sku_num'] is not null " +
+                "where source['table']='cart_info' and source['db']='gmall' " +
+                "and (op='r' or (op='u' and before['sku_num'] is not null " +
                 "and cast (after['sku_num'] as bigint) > cast(before['sku_num'] as bigint)))");
-        table.execute().print();
+//        table.execute().print();
         DataStream<Row> rowDataStream = tenv.toDataStream(table);
         SingleOutputStreamOperator<String> map = rowDataStream.map(String::valueOf);
-//        map.print();
+        map.print();
         map.sinkTo(
                 KafkaUtils.buildKafkaSink(kafka_bootstrap_servers,KAFKA_TOPIC_DWD_TRADE_CART_ADD)
         );
+
 
 
         env.execute();
