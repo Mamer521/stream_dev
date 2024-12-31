@@ -18,6 +18,8 @@ public class DwdInteractionCommentInfo {
     private static final String topicName= "topic_db";
     private static final String hbase_zookeeper= "cdh01:9092,cdh02:9092,cdh03:9092";
 
+    private static final String dwd_interaction_comment_info="dwd_interaction_comment_info";
+
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -46,15 +48,68 @@ public class DwdInteractionCommentInfo {
 
         Table comment = getComment(tableEnv);
 
-        comment.execute().print();
+//        comment.execute().print();
 
-//        tableEnv.createTemporaryView("comment_info",comment);
+        tableEnv.createTemporaryView("comment_info",comment);
 
         //4.读码表
-//        createBaseDic(tableEnv);
+        createBaseDic(tableEnv);
+
+        //关联数据
+        Table table = getTable(tableEnv);
+        //写入kafka
+        extracted(tableEnv);
+
+        table.execute().print();
+
+//        table.insertInto(dwd_interaction_comment_info).execute();
 
 
         env.execute();
+    }
+
+    private static void extracted(StreamTableEnvironment tableEnv) {
+        tableEnv.executeSql("create table "+dwd_interaction_comment_info+"(\n" +
+                "        id STRING,\n" +
+                "        user_id STRING,\n" +
+                "        nick_name STRING,\n" +
+                "        sku_id STRING,\n" +
+                "        spu_id STRING,\n" +
+                "        order_id STRING,\n" +
+                "        appraise_code STRING,\n" +
+                "        appraise_name STRING,\n" +
+                "        comment_txt STRING,\n" +
+                "        create_time STRING)");
+        /*
+        create table "+dwd_interaction_comment_info+"(
+        id STRING,
+        user_id STRING,
+        nick_name STRING,
+        sku_id STRING,
+        spu_id STRING,
+        order_id STRING,
+        appraise_code STRING,
+        appraise_name STRING,
+        comment_txt STRING,
+        create_time STRING)
+         */
+    }
+
+    private static Table getTable(StreamTableEnvironment tableEnv) {
+        return tableEnv.sqlQuery("SELECT\n" +
+                "        id,\n" +
+                "        user_id,\n" +
+                "        nick_name,\n" +
+                "        sku_id,\n" +
+                "        spu_id,\n" +
+                "        order_id,\n" +
+                "        appraise,\n" +
+                "        info.dic_name,\n" +
+                "        comment_txt,\n" +
+                "        create_time\n" +
+                "        FROM comment_info AS c\n" +
+                "        JOIN base_dic FOR SYSTEM_TIME AS OF c.proc_time AS b\n" +
+                "         ON c.appraise = b.rowkey");
     }
 
     private static void createBaseDic(StreamTableEnvironment tableEnv) {
